@@ -98,7 +98,7 @@ export default Vue.extend({
     innerValue: {
       handler () {
         if (
-          (this.useInput === true && this.fillInput === true && this.multiple !== true) &&
+          this.useInput === true && this.fillInput === true && this.multiple !== true &&
           ((this.dialog !== true && this.menu !== true) || this.hasValue !== true)
         ) {
           this.__resetInputValue()
@@ -777,8 +777,6 @@ export default Vue.extend({
     },
 
     __onControlFocusin (e) {
-      clearTimeout(this.focusoutTimer)
-
       if (this.editable !== true || this.focused === true) {
         return
       }
@@ -787,27 +785,35 @@ export default Vue.extend({
         return
       }
 
+      console.log('__onControlFocusin')
+      clearTimeout(this.focusoutTimer)
+
       this.focused = true
       this.$emit('focus', e)
     },
 
     __onControlFocusout (e) {
+      console.log('__onControlFocusout 1')
       clearTimeout(this.focusoutTimer)
 
       this.focusoutTimer = setTimeout(() => {
         clearTimeout(this.inputTimer)
 
+        console.log('__onControlFocusout 2')
         if (this.__hasInnerFocus() === true) {
           return
         }
 
+        console.log('__onControlFocusout 3')
         if (this.focused === true) {
+          console.log('__onControlFocusout 3.1')
           this.focused = false
           this.$emit('blur', e)
         }
 
         this.__resetInputValue()
         this.__closeMenu()
+        console.log('__onControlFocusout 4')
       }, 100)
     },
 
@@ -940,19 +946,20 @@ export default Vue.extend({
     },
 
     showPopup (e) {
-      clearTimeout(this.focusoutTimer)
+      console.log('showPopup 1')
 
-      if (this.focused === false) {
-        if (this.hasDialog === true) {
-          this.focused = true
-          this.dialog = true
-          this.$emit('focus', e)
-        }
-        else {
-          this.focus(e)
-        }
+      clearTimeout(this.focusoutTimer)
+      console.log('showPopup 2')
+      if (this.hasDialog === true) {
+        this.focused = true
+        this.dialog = true
+        this.$emit('focus', e)
+      }
+      else {
+        this.focus(e)
       }
 
+      console.log('showPopup 3')
       if (this.$listeners.filter !== void 0) {
         this.filter(this.inputValue)
       }
@@ -962,6 +969,7 @@ export default Vue.extend({
     },
 
     hidePopup () {
+      console.log('hidePopup')
       this.dialog = false
       this.__closeMenu()
     },
