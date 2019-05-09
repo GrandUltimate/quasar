@@ -670,8 +670,10 @@ export default Vue.extend({
       clearTimeout(this.inputTimer)
       this.inputValue = e.target.value || ''
 
+      console.log('__onInputValue 1')
       if (this.$listeners.filter !== void 0) {
         this.inputTimer = setTimeout(() => {
+          console.log('__onInputValue 2')
           this.filter(this.inputValue)
         }, this.inputDebounce)
       }
@@ -688,14 +690,17 @@ export default Vue.extend({
     },
 
     filter (val) {
+      console.log('filter 1')
       if (this.$listeners.filter === void 0 || this.focused !== true) {
         return
       }
 
       if (this.innerLoading === true) {
+        console.log('filter 2.1')
         this.$emit('filter-abort')
       }
       else {
+        console.log('filter 2.2')
         this.innerLoading = true
       }
 
@@ -705,6 +710,7 @@ export default Vue.extend({
         this.innerValue.length > 0 &&
         val === this.__getOptionValue(this.innerValue[0])
       ) {
+        console.log('filter 3')
         val = ''
       }
 
@@ -714,25 +720,31 @@ export default Vue.extend({
       clearTimeout(this.filterId)
       this.filterId = filterId
 
+      console.log('filter 4')
       this.$emit(
         'filter',
         val,
         fn => {
+          console.log('filter 4.1.1', this.focused === true, this.filterId, filterId)
           if (this.focused === true && this.filterId === filterId) {
             clearTimeout(this.filterId)
             typeof fn === 'function' && fn()
             this.$nextTick(() => {
               this.innerLoading = false
+              console.log('filter 4.1.2')
               if (this.menu === true) {
+                console.log('filter 4.1.2.1')
                 this.__updateMenu(true)
               }
               else {
+                console.log('filter 4.1.2.2')
                 this.menu = true
               }
             })
           }
         },
         () => {
+          console.log('filter 4.2')
           if (this.focused === true && this.filterId === filterId) {
             clearTimeout(this.filterId)
             this.innerLoading = false
@@ -936,12 +948,15 @@ export default Vue.extend({
     __closeMenu () {
       this.menu = false
 
-      clearTimeout(this.filterId)
-      this.filterId = void 0
+      if (this.focused === false) {
+        console.log('__closeMenu destroying')
+        clearTimeout(this.filterId)
+        this.filterId = void 0
 
-      if (this.innerLoading === true) {
-        this.$emit('filter-abort')
-        this.innerLoading = false
+        if (this.innerLoading === true) {
+          this.$emit('filter-abort')
+          this.innerLoading = false
+        }
       }
     },
 
@@ -951,9 +966,11 @@ export default Vue.extend({
       clearTimeout(this.focusoutTimer)
       console.log('showPopup 2')
       if (this.hasDialog === true) {
+        if (this.focused === false) {
+          this.$emit('focus', e)
+        }
         this.focused = true
         this.dialog = true
-        this.$emit('focus', e)
       }
       else {
         this.focus(e)

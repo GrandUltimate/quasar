@@ -675,6 +675,7 @@ export default {
     delayedFilterInputFn (val, update, abort) {
       // call abort() at any time if you can't retrieve data somehow
 
+      console.log('DEV delayedFilterInputFn')
       setTimeout(() => {
         update(() => {
           if (val === '') {
